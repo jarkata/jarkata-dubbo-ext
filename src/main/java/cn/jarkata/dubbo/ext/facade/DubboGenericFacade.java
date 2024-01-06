@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Dubbo泛化调用
  */
-public class GenericFacade {
+public class DubboGenericFacade {
 
     private static final ConcurrentHashMap<String, GenericService> cache = new ConcurrentHashMap<>();
 

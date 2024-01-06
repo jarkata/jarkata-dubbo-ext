@@ -6,12 +6,12 @@ import org.junit.Test;
 import java.util.ArrayList;
 
 
-public class GenericFacadeTest {
+public class DubboGenericFacadeTest {
 
     @Test(expected = NullPointerException.class)
     public void testInvoke() {
-        GenericFacade genericFacade = new GenericFacade();
-        Object invoked = genericFacade.invokeMethod(null, new ArrayList<>());
+        DubboGenericFacade dubboGenericFacade = new DubboGenericFacade();
+        Object invoked = dubboGenericFacade.invokeMethod(null, new ArrayList<>());
         Assert.assertNotNull(invoked);
     }
 
