@@ -8,15 +8,15 @@ import org.apache.dubbo.config.SslConfig;
 import org.apache.dubbo.config.bootstrap.DubboBootstrap;
 import org.apache.dubbo.rpc.service.GenericService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Dubbo泛化调用
  */
 public class GenericFacade {
+
+    private static final ConcurrentHashMap<String, GenericService> cache = new ConcurrentHashMap<>();
 
     /**
      * 调用Dubbo接口
@@ -42,6 +42,13 @@ public class GenericFacade {
 
 
     private GenericService getGenericService(DubboInterfaceConfig interfaceConfig) {
+
+        String cacheKey = buildCacheKey(interfaceConfig);
+        GenericService genericService = cache.get(cacheKey);
+        if (Objects.nonNull(genericService)) {
+            return genericService;
+        }
+
         ReferenceConfig<GenericService> referenceConfig = new ReferenceConfig<>();
         referenceConfig.setGeneric("true");
         referenceConfig.setCheck(interfaceConfig.isCheck());
@@ -70,9 +77,17 @@ public class GenericFacade {
             sslConfig.setClientTrustCertCollectionPath(path);
             dubboBootstrap.ssl(sslConfig);
         }
-
         dubboBootstrap.protocol(protocolConfig);
         referenceConfig.setBootstrap(dubboBootstrap);
-        return referenceConfig.get();
+        genericService = referenceConfig.get();
+        if (Objects.nonNull(genericService)) {
+            cache.putIfAbsent(cacheKey, genericService);
+        }
+        return genericService;
     }
+
+    private String buildCacheKey(DubboInterfaceConfig interfaceConfig) {
+        return interfaceConfig.getUrl() + interfaceConfig.getApplication() + interfaceConfig.getServiceName() + interfaceConfig.getGroup() + interfaceConfig.getVersion();
+    }
+
 }
