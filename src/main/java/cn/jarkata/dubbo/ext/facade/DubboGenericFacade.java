@@ -26,20 +26,23 @@ public class DubboGenericFacade {
      * @return Dubbo接口响应结果
      */
     public Object invokeMethod(DubboInterfaceConfig interfaceConfig, List<Object> data) {
+        data = Optional.ofNullable(data).orElse(new ArrayList<>(0));
+        return invokeMethod(interfaceConfig, data.toArray());
+    }
+
+    public Object invokeMethod(DubboInterfaceConfig interfaceConfig, Object[] data) {
         Objects.requireNonNull(interfaceConfig, "DubboInterface Null");
         Objects.requireNonNull(StringUtils.trimToNull(interfaceConfig.getMethodName()), "MethodName Empty");
         Objects.requireNonNull(StringUtils.trimToNull(interfaceConfig.getServiceName()), "ServiceName Empty");
         Objects.requireNonNull(StringUtils.trimToNull(interfaceConfig.getUrl()), "Url Empty");
+        String[] parameterTypeArray = interfaceConfig.getParameterType();
 
-        List<String> parameterType = Optional.ofNullable(interfaceConfig.getParameterType()).orElse(new ArrayList<>(0));
-        String[] parameterTypeArray = parameterType.toArray(new String[0]);
-
-        data = Optional.ofNullable(data).orElse(new ArrayList<>(0));
+        parameterTypeArray = Optional.ofNullable(parameterTypeArray).orElse(new String[0]);
+        data = Optional.ofNullable(data).orElse(new Object[0]);
 
         GenericService genericService = getGenericService(interfaceConfig);
-        return genericService.$invoke(interfaceConfig.getMethodName(), parameterTypeArray, data.toArray());
+        return genericService.$invoke(interfaceConfig.getMethodName(), parameterTypeArray, data);
     }
-
 
     private GenericService getGenericService(DubboInterfaceConfig interfaceConfig) {
 
