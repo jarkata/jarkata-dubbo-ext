@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>jarkata-dubbo-ext</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>jarkata-dubbo-ext</name>
     <url>https://github.com/jarkata/jarkata-dubbo-ext</url>
 
