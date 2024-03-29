@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>jarkata-dubbo-ext</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>jarkata-dubbo-ext</name>
     <url>https://github.com/jarkata/jarkata-dubbo-ext</url>
 
@@ -17,39 +17,34 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <jarkata-commons.version>2.0.13</jarkata-commons.version>
+        <netty-all.version>4.1.104.Final</netty-all.version>
+        <dubbo.version>2.7.23</dubbo.version>
+        <lombok.version>1.18.30</lombok.version>
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>cn.jarkata</groupId>
             <artifactId>jarkata-commons</artifactId>
-            <version>2.0.10</version>
+            <version>${jarkata-commons.version}</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.1.104.Final</version>
+            <version>${netty-all.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
-        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>2.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo</artifactId>
-            <version>2.7.23</version>
+            <version>${dubbo.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>hessian-lite</artifactId>
@@ -92,4 +87,34 @@
         <url>https://github.com/jarkata/jarkata-dubbo-ext.git</url>
     </scm>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- reduce console output. Can override with -Dquiet=false -->
+                    <quiet>true</quiet>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
