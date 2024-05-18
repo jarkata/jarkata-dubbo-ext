@@ -1,6 +1,7 @@
 package cn.jarkata.dubbo.ext.facade;
 
 import cn.jarkata.commons.utils.StringUtils;
+import org.apache.dubbo.common.URL;
 import org.apache.dubbo.config.ProtocolConfig;
 import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.RegistryConfig;
@@ -17,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DubboGenericFacade {
 
     private static final ConcurrentHashMap<String, GenericService> cache = new ConcurrentHashMap<>();
+    private static final String SSL_ENABLED_Y = "Y";
+    private static final String SSL_ENABLED = "ssl-enabled";
 
     /**
      * 调用Dubbo接口
@@ -61,19 +64,12 @@ public class DubboGenericFacade {
         referenceConfig.setTimeout(interfaceConfig.getTimeout());
 
         String configUrl = interfaceConfig.getUrl();
-        if (interfaceConfig.isUseRegister()) {
-            RegistryConfig registryConfig = new RegistryConfig();
-            registryConfig.setAddress(configUrl);
-            referenceConfig.setRegistry(registryConfig);
-        } else {
-            referenceConfig.setUrl(configUrl);
-        }
 
         DubboBootstrap dubboBootstrap = DubboBootstrap.getInstance();
         dubboBootstrap.application(interfaceConfig.getApplication());
 
         ProtocolConfig protocolConfig = new ProtocolConfig();
-        if ("Y".equalsIgnoreCase(interfaceConfig.getEnableSsl())) {
+        if (SSL_ENABLED_Y.equalsIgnoreCase(interfaceConfig.getEnableSsl())) {
             protocolConfig.setSslEnabled(true);
             String path = System.getProperty("dubbo.ssl.client-trust-cert-collection-path");
             SslConfig sslConfig = new SslConfig();
@@ -82,6 +78,19 @@ public class DubboGenericFacade {
         }
         dubboBootstrap.protocol(protocolConfig);
         referenceConfig.setBootstrap(dubboBootstrap);
+
+        if (interfaceConfig.isUseRegister()) {
+            RegistryConfig registryConfig = new RegistryConfig();
+            registryConfig.setAddress(configUrl);
+            referenceConfig.setRegistry(registryConfig);
+        } else {
+            URL url = URL.valueOf(configUrl);
+            if (SSL_ENABLED_Y.equalsIgnoreCase(interfaceConfig.getEnableSsl())) {
+                url = url.addParameter(SSL_ENABLED, SSL_ENABLED_Y);
+            }
+            referenceConfig.setUrl(url.toFullString());
+        }
+
         genericService = referenceConfig.get();
         if (Objects.nonNull(genericService)) {
             cache.putIfAbsent(cacheKey, genericService);
