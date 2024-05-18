@@ -90,10 +90,10 @@ public class DubboGenericFacade {
             }
             referenceConfig.setUrl(url.toFullString());
         }
-
         genericService = referenceConfig.get();
         if (Objects.nonNull(genericService)) {
             cache.putIfAbsent(cacheKey, genericService);
+            Runtime.getRuntime().addShutdownHook(new Thread(referenceConfig::destroy));
         }
         return genericService;
     }
