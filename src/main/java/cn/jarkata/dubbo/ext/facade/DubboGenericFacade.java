@@ -21,6 +21,12 @@ public class DubboGenericFacade {
     private static final String SSL_ENABLED_Y = "Y";
     private static final String SSL_ENABLED = "ssl-enabled";
 
+    public DubboGenericFacade() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            DubboBootstrap.getInstance().destroy();
+        }));
+    }
+
     /**
      * 调用Dubbo接口
      *
